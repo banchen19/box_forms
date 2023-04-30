@@ -22,8 +22,8 @@ java模仿bds的箱子菜单
 
 注意：配置文件中的菜单项格式必须与默认配置文件的格式一致，否则可能导致解析失败。
 
-
 例如：
+```j
 {
   "ENDER_PEARL": {
     "type": "from",
@@ -49,4 +49,6 @@ java模仿bds的箱子菜单
     "command": "",
     "command_from": "./plugins/box_menu/op.json"
   }
-}
+    }
+
+```
