@@ -1,11 +1,20 @@
-package box_forms.banchen;
+package box_menu.banchen;
 
 public class Form {
     int id;
     String item_name;
+    String name;
     String type;
     String command;
     String command_form;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public int getId() {
         return id;
@@ -47,9 +56,10 @@ public class Form {
         this.command_form = command_form;
     }
 
-    public Form(int id, String item_name, String type, String command, String command_form) {
+    public Form(int id, String item_name, String name, String type, String command, String command_form) {
         this.id = id;
         this.item_name = item_name;
+        this.name = name;
         this.type = type;
         this.command = command;
         this.command_form = command_form;

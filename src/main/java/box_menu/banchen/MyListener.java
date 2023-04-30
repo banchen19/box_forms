@@ -1,70 +1,102 @@
-package box_forms.banchen;
+package box_menu.banchen;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.util.Consumer;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.List;
+import java.util.logging.Logger;
 
-import static box_forms.banchen.File_json_U.file_to_json;
-import static box_forms.banchen.File_json_U.read_file_json;
+import static box_menu.banchen.Box_forms_bc.extractMiddleField;
+import static box_menu.banchen.File_json_U.file_to_json;
+import static box_menu.banchen.File_json_U.read_file_json;
 
 public class MyListener implements Listener {
+    FormListSingleton formListSingleton;
     List<Form> formList;
-    public  MyListener(List<Form> formList)
-    {
-        this.formList=formList;
-    }
+
     //form的json
     @EventHandler
-    public void onInventoryClick(InventoryClickEvent event) throws IOException {
-        // 确保事件触发于当前打开的视图物品栏上
-        Inventory inventory=event.getInventory();
-        event.getInventory();
-        if (!inventory.equals(inventory)) {
-            return;
-        }
-        // 获取物品栏内的位置
-        int slot = event.getRawSlot();
-        Form form=formList.get(slot);
-        // 获取玩家
-        Player player = (Player) event.getWhoClicked();
-        event.setCancelled(true);
-        if (form.getType().equals("command"))
-        {
-            //以玩家的名义执行命令
-            player.closeInventory();
-            player.performCommand(form.getCommand());
-        }else if(form.getType().equals("opcommand"))
-        {
-            //以控制台的名义执行某个指令
-            player.closeInventory();
-            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), form.getCommand());
-        }else
-        {
+    public void onInventoryClick(InventoryClickEvent event) {
+        formListSingleton = FormListSingleton.getInstance();
+        formList = formListSingleton.getFormList();
 
-            //打开新的表单
-            MyInventoryHolder holder = null;
-            try {
-                holder = new MyInventoryHolder(file_to_json( read_file_json(form.getCommand_form())));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        String title = event.getView().getTitle();
+
+        if (title.equals(formListSingleton.getTitle())) {
+            // 在这里添加处理代码
+            Player player = (Player) event.getWhoClicked(); // 获取玩家对象
+
+            int slot = event.getRawSlot();
+
+            if (slot >= 0 && slot < formList.size()) {
+                try {
+                    Form form = formList.get(slot);
+                    inventoryopen(form, player);
+
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
+            event.setCancelled(true); // 取消事件
+        }
+    }
+
+    void inventoryopen(Form form, Player player) throws IOException {
+        switch (form.getType()) {
+            case "command":
+                // 以玩家的名义执行命令
+                player.performCommand(form.getCommand());
+                player.closeInventory();
+
+                break;
+            case "tell":
+                player.sendMessage(form.getCommand());
+                player.closeInventory();
+                break;
+            case "opcommand":
+
+                Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), form.getCommand());
+                player.closeInventory();
+
+                break;
+            case "from":
+                // 打开新的表单
+                to_inventory(form, player);
+
+                break;
+            case "opfrom":
+                // 打开新的表单
+                if (player.isOp()) {
+                    to_inventory(form, player);
+                } else {
+                    player.closeInventory();
+                    player.sendMessage("权限不足");
+                }
+                break;
+            default:
+                // 处理未知类型
+                break;
+        }
+    }
+
+    private void to_inventory(Form form, Player player) {
+        try {
             player.closeInventory();
+
+            formListSingleton.setFormList(file_to_json(read_file_json(form.getCommand_form())));
+            if (extractMiddleField(form.getCommand_form()).equals("config")) {
+                formListSingleton.setTitle("主菜单");
+            } else {
+                formListSingleton.setTitle(extractMiddleField(form.getCommand_form()));
+            }
+            MyInventoryHolder holder = new MyInventoryHolder(file_to_json(read_file_json(form.getCommand_form())));
             player.openInventory(holder.getInventory());
+        } catch (IOException e) {
+            player.sendMessage("非法配置文件：" + e.getMessage() + "请联系伺服器技术人员");
         }
     }
 

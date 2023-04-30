@@ -1,4 +1,4 @@
-package box_forms.banchen;
+package box_menu.banchen;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -7,6 +7,9 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +24,7 @@ public class File_json_U {
     static JsonObject read_file_json(String filePath) throws IOException {
         JsonObject jsonObject = null;
         BufferedReader br = new BufferedReader(
-                new InputStreamReader(new FileInputStream(filePath), "UTF-8"));
+                new InputStreamReader(Files.newInputStream(Paths.get(filePath)), StandardCharsets.UTF_8));
         StringBuilder sb = new StringBuilder();
         String line;
         while ((line = br.readLine()) != null) {
@@ -45,13 +48,14 @@ public class File_json_U {
             JsonObject itemObject = jsonObject.getAsJsonObject(key);
             String type = itemObject.get("type").getAsString();
             String command = itemObject.get("command").getAsString();
-            String command_form = itemObject.get("command_form").getAsString();
+            String command_form = itemObject.get("command_from").getAsString();
+            String command_name = itemObject.get("name").getAsString();
             // 处理物品数据值
-            Form form = new Form(id, key, type, command, command_form);
+            Form form = new Form(id, key,command_name,type, command, command_form);
             formList.add(form);
             id++;
         }
-        return formList; // return the list of Form objects
+        return formList;
     }
 
 }

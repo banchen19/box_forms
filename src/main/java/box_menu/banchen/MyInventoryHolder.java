@@ -1,6 +1,5 @@
-package box_forms.banchen;
+package box_menu.banchen;
 
-import com.google.gson.JsonObject;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -11,26 +10,28 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 public class MyInventoryHolder implements InventoryHolder {
     private static Inventory inventory;
     public MyInventoryHolder(List<Form> formList) throws IOException {
-        //创建一个箱子菜单
-        //物品类型，物品所在的位置
-        inventory = Bukkit.createInventory(this, 27, formList.get(0).getCommand());
+        FormListSingleton formListSingleton = FormListSingleton.getInstance();
+        inventory = Bukkit.createInventory(this, 27, formListSingleton.getTitle());
         for (Form form:formList) {
-            ItemStack item =  new ItemStack(Objects.requireNonNull(Material.getMaterial(form.getItem_name())),1);
+            String from_str= String.valueOf(Material.getMaterial(form.getItem_name()));
+            if (from_str.equals("null")) from_str="BIRCH_WOOD";
+            ItemStack item =  new ItemStack(Objects.requireNonNull(Material.getMaterial(from_str)),1);
             ItemMeta meta = item.getItemMeta();
             if(form.getType().equals("command")){
-                meta.setDisplayName("执行指令："+form.getCommand());
+                meta.setDisplayName("执行："+form.getName());
             }
-            else {
-                meta.setDisplayName("跳转菜单："+form.getCommand());
+            else  if(!form.getType().equals("opcommand")){
+                meta.setDisplayName("打开："+form.getName());
             }
-
             item.setItemMeta(meta);
             inventory.setItem(form.getId(), item);
         }
+
     }
     @Override
     public Inventory getInventory() {
