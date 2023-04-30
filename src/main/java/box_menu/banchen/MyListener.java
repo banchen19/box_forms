@@ -79,6 +79,7 @@ public class MyListener implements Listener {
                 break;
             default:
                 // 处理未知类型
+                player.closeInventory();
                 break;
         }
     }
