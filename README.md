@@ -21,3 +21,32 @@ java模仿bds的箱子菜单
     BEDROCK：管理员菜单，打开指定的管理员菜单文件。
 
 注意：配置文件中的菜单项格式必须与默认配置文件的格式一致，否则可能导致解析失败。
+
+
+例如：
+{
+  "ENDER_PEARL": {
+    "type": "from",
+    "name": "家园传送点",
+    "command": "",
+    "command_from": "./plugins/box_menu/home.json"
+  },
+  "SLIME_BALL": {
+    "type": "command",
+    "name": "获取粘液科技书",
+    "command": "sf guide",
+    "command_from": ""
+  },
+  "PLAYER_HEAD": {
+    "type": "tell",
+    "name": "玩家间传送",
+    "command": "使用 /tpa 玩家名 进行传送申请\n使用/tpyes或/tpno同意或拒绝传送",
+    "command_from": ""
+  },
+  "BEDROCK": {
+    "type": "opfrom",
+    "name": "管理员菜单",
+    "command": "",
+    "command_from": "./plugins/box_menu/op.json"
+  }
+}
