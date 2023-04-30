@@ -1,0 +1,10 @@
+name: box_menu
+version: '${project.version}'
+main: box_menu.banchen.Box_forms_bc
+api-version: 1.18
+commands:
+  from_cd:
+    description: "箱子菜单"
+    aliases: cd
+  load:
+    description: "箱子菜单命令重载"
